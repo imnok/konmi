@@ -1,38 +1,66 @@
 <?php
 /**
- * @package konmi
+ *
+ * @package Konmi
  */
 ?>
 
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-	<header class="entry-header">
-		<?php the_title( sprintf( '<h1 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h1>' ); ?>
+<article id="post-<?php the_ID(); ?>" <?php post_class( 'box' ); ?>>
+	<div class="row">
+		<div class="large-12 columns">
+		<?php if ( has_post_thumbnail() ) : ?>
+			<div class="row">
+				<div class="large-4 columns right">
+					<?php the_post_thumbnail(); ?>
+				</div>
+				<div class="large-8 columns">
+					<header class="entry-header">
+						<?php the_title( sprintf( '<h4 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h4>' ); ?>
+					</header><!-- .entry-header -->
 
-		<?php if ( 'post' == get_post_type() ) : ?>
-		<div class="entry-meta">
-			<?php konmi_posted_on(); ?>
-		</div><!-- .entry-meta -->
+					<div class="entry-excerpt">
+
+						<?php the_excerpt(); ?>
+
+						<?php
+							wp_link_pages( array(
+								'before' => '<div class="page-links">' . __( 'Pages:', 'konmi' ),
+								'after'  => '</div>',
+							) );
+						?>
+					</div><!-- .entry-content -->
+					
+				</div>
+			</div>
+
+		<?php else : ?>
+			<header class="entry-header">
+				<?php the_title( sprintf( '<h4 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h4>' ); ?>
+			</header><!-- .entry-header -->
+
+			<div class="entry-excerpt"><!-- content -->
+
+				<?php the_excerpt(); ?>
+
+				<?php
+					wp_link_pages( array(
+						'before' => '<div class="page-links">' . __( 'Pages:', 'konmi' ),
+						'after'  => '</div>',
+					) );
+				?>
+			</div><!-- .entry-content -->
+		
 		<?php endif; ?>
-	</header><!-- .entry-header -->
 
-	<div class="entry-content">
-		<?php
-			/* translators: %s: Name of current post */
-			the_content( sprintf(
-				__( 'Continue reading %s <span class="meta-nav">&rarr;</span>', 'konmi' ),
-				the_title( '<span class="screen-reader-text">"', '"</span>', false )
-			) );
-		?>
+		
+	
+			<div class="entry-meta">
+				<?php konmi_entry_meta(); ?>
+			</div>
 
-		<?php
-			wp_link_pages( array(
-				'before' => '<div class="page-links">' . __( 'Pages:', 'konmi' ),
-				'after'  => '</div>',
-			) );
-		?>
-	</div><!-- .entry-content -->
+		</div>
+	</div>
+	
 
-	<footer class="entry-footer">
-		<?php konmi_entry_footer(); ?>
-	</footer><!-- .entry-footer -->
+	
 </article><!-- #post-## -->

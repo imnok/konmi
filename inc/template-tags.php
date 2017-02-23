@@ -4,31 +4,29 @@
  *
  * Eventually, some of the functionality here could be replaced by core features.
  *
- * @package konmi
+ * @package Konmi
  */
 
-if ( ! function_exists( 'the_posts_navigation' ) ) :
+if ( ! function_exists( 'konmi_paging_nav' ) ) :
 /**
  * Display navigation to next/previous set of posts when applicable.
- *
- * @todo Remove this function when WordPress 4.3 is released.
  */
-function the_posts_navigation() {
+function konmi_paging_nav() {
 	// Don't print empty markup if there's only one page.
 	if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
 		return;
 	}
 	?>
-	<nav class="navigation posts-navigation" role="navigation">
-		<h2 class="screen-reader-text"><?php _e( 'Posts navigation', 'konmi' ); ?></h2>
+	<nav class="navigation paging-navigation" role="navigation">
+		<h1 class="screen-reader-text"><?php _e( 'Posts navigation', 'konmi' ); ?></h1>
 		<div class="nav-links">
 
 			<?php if ( get_next_posts_link() ) : ?>
-			<div class="nav-previous"><?php next_posts_link( __( 'Older posts', 'konmi' ) ); ?></div>
+			<div class="nav-previous"><?php next_posts_link( __( '<span class="meta-nav">&larr;</span> Older posts', 'konmi' ) ); ?></div>
 			<?php endif; ?>
 
 			<?php if ( get_previous_posts_link() ) : ?>
-			<div class="nav-next"><?php previous_posts_link( __( 'Newer posts', 'konmi' ) ); ?></div>
+			<div class="nav-next"><?php previous_posts_link( __( 'Newer posts <span class="meta-nav">&rarr;</span>', 'konmi' ) ); ?></div>
 			<?php endif; ?>
 
 		</div><!-- .nav-links -->
@@ -37,13 +35,11 @@ function the_posts_navigation() {
 }
 endif;
 
-if ( ! function_exists( 'the_post_navigation' ) ) :
+if ( ! function_exists( 'konmi_post_nav' ) ) :
 /**
  * Display navigation to next/previous post when applicable.
- *
- * @todo Remove this function when WordPress 4.3 is released.
  */
-function the_post_navigation() {
+function konmi_post_nav() {
 	// Don't print empty markup if there's nowhere to navigate.
 	$previous = ( is_attachment() ) ? get_post( get_post()->post_parent ) : get_adjacent_post( false, '', true );
 	$next     = get_adjacent_post( false, '', false );
@@ -53,11 +49,11 @@ function the_post_navigation() {
 	}
 	?>
 	<nav class="navigation post-navigation" role="navigation">
-		<h2 class="screen-reader-text"><?php _e( 'Post navigation', 'konmi' ); ?></h2>
+		<h1 class="screen-reader-text"><?php _e( 'Post navigation', 'konmi' ); ?></h1>
 		<div class="nav-links">
 			<?php
-				previous_post_link( '<div class="nav-previous">%link</div>', '%title' );
-				next_post_link( '<div class="nav-next">%link</div>', '%title' );
+				previous_post_link( '<div class="nav-previous">%link</div>', _x( '<span class="meta-nav">&larr;</span>&nbsp;%title', 'Previous post link', 'konmi' ) );
+				next_post_link(     '<div class="nav-next">%link</div>',     _x( '%title&nbsp;<span class="meta-nav">&rarr;</span>', 'Next post link',     'konmi' ) );
 			?>
 		</div><!-- .nav-links -->
 	</nav><!-- .navigation -->
@@ -83,8 +79,9 @@ function konmi_posted_on() {
 	);
 
 	$posted_on = sprintf(
-		_x( 'Posted on %s', 'post date', 'konmi' ),
-		'<a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>'
+
+		_x( '%s', 'post date', 'konmi' ),
+		'PUBLISHED ON ' . $time_string
 	);
 
 	$byline = sprintf(
@@ -94,6 +91,101 @@ function konmi_posted_on() {
 
 	echo '<span class="posted-on">' . $posted_on . '</span><span class="byline"> ' . $byline . '</span>';
 
+
+	if ( 'post' == get_post_type() ) {
+		/* translators: used between list items, there is a space after the comma */
+		$categories_list = get_the_category_list( __( ', ', 'konmi' ) );
+		if ( $categories_list && konmi_categorized_blog() ) {
+			printf( '<span class="cat-links">' . __( 'in %1$s', 'konmi' ) . '</span>', $categories_list );
+		}
+	}
+
+}
+endif;
+
+
+if ( ! function_exists('konmi_entry_meta') ) :
+/**
+ * Prints HTML with meta information for the current post-date/time and author.
+ */
+function konmi_entry_meta() {
+	if ( is_sticky() && is_home() && ! is_paged() ) {
+		printf( '<span class="sticky-post">%s</span>', __( 'Featured', 'konmi' ) );
+	}
+
+	// Comment post format
+	$format = get_post_format();
+	if ( current_theme_supports( 'post-formats', $format ) ) {
+		printf( '<span class="entry-format">%1$s<a href="%2$s">%3$s</a></span>',
+			sprintf( '<span class="screen-reader-text">%s </span>', _x( 'Format', 'Used before post format.', 'konmi' ) ),
+			esc_url( get_post_format_link( $format ) ),
+			get_post_format_string( $format )
+		);
+	}
+
+	if ( in_array( get_post_type(), array( 'post', 'attachment' ) ) ) {
+		$time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
+
+		if ( get_the_time( 'U' ) !== get_the_modified_time( 'U' ) ) {
+			$time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
+		}
+
+		$time_string = sprintf( $time_string,
+			esc_attr( get_the_date( 'c' ) ),
+			get_the_date(),
+			esc_attr( get_the_modified_date( 'c' ) ),
+			get_the_modified_date()
+		);
+
+		printf( '<span class="posted-on">PUBLISHED ON <span class="screen-reader-text">%1$s </span><a href="%2$s" rel="bookmark">%3$s</a></span>',
+			_x( 'Posted on', 'Used before publish date.', 'konmi' ),
+			esc_url( get_permalink() ),
+			$time_string
+		);
+	}
+
+	if ( 'post' == get_post_type() ) {
+
+		if ( is_singular() || is_multi_author() ) {
+			printf( '<span class="byline"><span class="author vcard"><span class="screen-reader-text">%1$s </span>BY <a class="url fn n" href="%2$s">%3$s</a></span></span>',
+				_x( 'Author', 'Used before post author name.', 'konmi' ),
+				esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+				get_the_author()
+			);
+		}
+
+		$categories_list = get_the_category_list( _x( ', ', 'Used between list items, there is a space after the comma.', 'konmi' ) );
+		if ( $categories_list && konmi_categorized_blog() ) {
+			printf( '<span class="cat-links">in <span class="screen-reader-text">%1$s </span>%2$s</span>',
+				_x( 'Categories', 'Used before category names.', 'konmi' ),
+				$categories_list
+			);
+		}
+
+		edit_post_link( __( 'Edit', 'konmi' ), '<span class="edit-link"> <span class="ti-pencil"></span> ', '</span>' );
+
+		$tags_list = get_the_tag_list( '', _x( ', ', 'Used between list items, there is a space after the comma.', 'konmi' ) );
+		if ( $tags_list ) {
+			printf( '<br><span class="tags-links"><span class="screen-reader-text">%1$s </span>%2$s</span>',
+				_x( 'Tags', 'Used before tag names.', 'konmi' ),
+				$tags_list
+			);
+		}
+		
+	}
+
+	if ( is_attachment() && wp_attachment_is_image() ) {
+		// Retrieve attachment metadata.
+		$metadata = wp_get_attachment_metadata();
+
+		printf( '<span class="full-size-link"><span class="screen-reader-text">%1$s </span><a href="%2$s">%3$s &times; %4$s</a></span>',
+			_x( 'Full size', 'Used before full size attachment link.', 'konmi' ),
+			esc_url( wp_get_attachment_url() ),
+			$metadata['width'],
+			$metadata['height']
+		);
+	}
+	
 }
 endif;
 
@@ -104,16 +196,11 @@ if ( ! function_exists( 'konmi_entry_footer' ) ) :
 function konmi_entry_footer() {
 	// Hide category and tag text for pages.
 	if ( 'post' == get_post_type() ) {
-		/* translators: used between list items, there is a space after the comma */
-		$categories_list = get_the_category_list( __( ', ', 'konmi' ) );
-		if ( $categories_list && konmi_categorized_blog() ) {
-			printf( '<span class="cat-links">' . __( 'Posted in %1$s', 'konmi' ) . '</span>', $categories_list );
-		}
 
 		/* translators: used between list items, there is a space after the comma */
-		$tags_list = get_the_tag_list( '', __( ', ', 'konmi' ) );
+		$tags_list = get_the_tag_list( ' ', __( ' ', 'konmi' ) );
 		if ( $tags_list ) {
-			printf( '<span class="tags-links">' . __( 'Tagged %1$s', 'konmi' ) . '</span>', $tags_list );
+			printf( '<span class="tags-links">' . __( '%1$s', 'konmi' ) . '</span>', $tags_list );
 		}
 	}
 
@@ -122,8 +209,6 @@ function konmi_entry_footer() {
 		comments_popup_link( __( 'Leave a comment', 'konmi' ), __( '1 Comment', 'konmi' ), __( '% Comments', 'konmi' ) );
 		echo '</span>';
 	}
-
-	edit_post_link( __( 'Edit', 'konmi' ), '<span class="edit-link">', '</span>' );
 }
 endif;
 

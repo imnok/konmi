@@ -1,8 +1,8 @@
 <?php
 /**
- * konmi functions and definitions
+ * Konmi functions and definitions
  *
- * @package konmi
+ * @package Konmi 
  */
 
 /**
@@ -25,7 +25,7 @@ function konmi_setup() {
 	/*
 	 * Make theme available for translation.
 	 * Translations can be filed in the /languages/ directory.
-	 * If you're building a theme based on konmi, use a find and replace
+	 * If you're building a theme based on Konmi, use a find and replace
 	 * to change 'konmi' to the name of your theme in all the template files
 	 */
 	load_theme_textdomain( 'konmi', get_template_directory() . '/languages' );
@@ -46,11 +46,12 @@ function konmi_setup() {
 	 *
 	 * @link http://codex.wordpress.org/Function_Reference/add_theme_support#Post_Thumbnails
 	 */
-	//add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'post-thumbnails' );
 
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menus( array(
 		'primary' => __( 'Primary Menu', 'konmi' ),
+		'social'  => __( 'Social Links Menu', 'konmi' ),
 	) );
 
 	/*
@@ -66,7 +67,7 @@ function konmi_setup() {
 	 * See http://codex.wordpress.org/Post_Formats
 	 */
 	add_theme_support( 'post-formats', array(
-		'aside', 'image', 'video', 'quote', 'link',
+		'aside', 'image', 'video', 'audio', 'quote', 'link', 'gallery',
 	) );
 
 	// Set up the WordPress core custom background feature.
@@ -74,9 +75,16 @@ function konmi_setup() {
 		'default-color' => 'ffffff',
 		'default-image' => '',
 	) ) );
+
+	/*
+	 * This theme styles the visual editor to resemble the theme style,
+	 * specifically font, colors, icons, and column width.
+	 */
+	add_editor_style( array( 'css/editor-style.css', 'genericons/genericons.css', konmi_fonts_url() ) );
 }
 endif; // konmi_setup
 add_action( 'after_setup_theme', 'konmi_setup' );
+
 
 /**
  * Register widget area.
@@ -90,27 +98,151 @@ function konmi_widgets_init() {
 		'description'   => '',
 		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
+		'before_title'  => '<h3 class="widget-title"><span class="underline">',
+		'after_title'   => '</span></h3>',
 	) );
 }
 add_action( 'widgets_init', 'konmi_widgets_init' );
+
+if ( ! function_exists( 'konmi_fonts_url' ) ) :
+/**
+ * Register Google fonts for Twenty Fifteen.
+ *
+ * @since Twenty Fifteen 1.0
+ *
+ * @return string Google fonts URL for the theme.
+ */
+function konmi_fonts_url() {
+	$fonts_url = '';
+
+	/* Translators: If there are characters in your language that are not
+	 * supported by Source Sans Pro, translate this to 'off'. Do not translate
+	 * into your own language.
+	 */
+	$merriweather = _x( 'on', 'Merriweather font: on or off', 'konmi' );
+
+	/* Translators: If there are characters in your language that are not
+	 * supported by Bitter, translate this to 'off'. Do not translate into your
+	 * own language.
+	 */
+	$oxygen = _x( 'on', 'Oxygen font: on or off', 'konmi' );
+
+	if ( 'off' !== $merriweather || 'off' !== $oxygen ) {
+		$font_families = array();
+
+		if ( 'off' !== $merriweather )
+			$font_families[] = 'Merriweather:400,300,700,400italic,300italic,700italic,900,900italic:latin';
+
+		if ( 'off' !== $oxygen )
+			$font_families[] = 'Oxygen:300,400,700';
+
+		$query_args = array(
+			'family' => urlencode( implode( '|', $font_families ) ),
+			'subset' => urlencode( 'latin,latin-ext' ),
+		);
+		$fonts_url = add_query_arg( $query_args, "//fonts.googleapis.com/css" );
+	}
+
+	return $fonts_url;
+}
+endif;
 
 /**
  * Enqueue scripts and styles.
  */
 function konmi_scripts() {
+
+
 	wp_enqueue_style( 'konmi-style', get_stylesheet_uri() );
+
+	/* Add Foundation CSS */
+	wp_enqueue_style( 'foundation-normalize', get_template_directory_uri() . '/foundation/css/normalize.css' );
+	wp_enqueue_style( 'foundation', get_template_directory_uri() . '/foundation/css/foundation.css' );
+	
+	/* Add Custom CSS */
+	wp_enqueue_style( 'konmi-custom-style', get_template_directory_uri() . '/custom.css', array(), '1' );
+	
+	/* Add Foundation JS */
+	wp_enqueue_script( 'foundation-js', get_template_directory_uri() . '/foundation/js/foundation.min.js', array( 'jquery' ), '1', true );
+	wp_enqueue_script( 'foundation-modernizr-js', get_template_directory_uri() . '/foundation/js/vendor/modernizr.js', array( 'jquery' ), '1', true );
+	
+	/* Foundation Init JS */
+	wp_enqueue_script( 'foundation-init-js', get_template_directory_uri() . '/foundation.js', array( 'jquery' ), '1', true );
+
+
+	// Add Genericons, used in the main stylesheet.
+	wp_enqueue_style( 'genericons', get_template_directory_uri() . '/genericons/genericons.css', array(), '3.2' );
+
+	// Add Themify icons, used in the main stylesheet.
+	wp_enqueue_style( 'themify-icons', get_template_directory_uri() . '/css/themify-icons.css', array(), '' );
+	
+	// Add Font Awesome, used in the main stylesheet.
+	wp_enqueue_style( 'font-awesome', get_template_directory_uri() . '/css/font-awesome.css', array(), '' );
+
+	// Add custom fonts, used in the main stylesheet.
+	wp_enqueue_style( 'konmi-fonts', konmi_fonts_url(), array(), null );
 
 	wp_enqueue_script( 'konmi-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
 
 	wp_enqueue_script( 'konmi-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20130115', true );
+
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'konmi_scripts' );
+
+function konmi_nav_menu($menu){
+	$menu = str_replace('menu-item-has-children', 'menu-item-has-children has-dropdown', $menu);
+	$menu = str_replace('sub-menu', 'sub-menu dropdown', $menu);
+	return $menu;
+}
+add_filter('wp_nav_menu','konmi_nav_menu');
+
+
+/*add_filter("the_content", "plugin_myContentFilter");
+
+function plugin_myContentFilter($content)
+{
+	// If content characters less than 500 then get content
+	$length = 200;
+	if(strlen($content)<$length+10) return $content;
+	// else content characters more than 500 then cut it and add ... the end
+	// Take the existing content and return a subset of it
+	return substr($content, 0, 200). "...";
+}*/
+
+
+function konmi_custom_excerpt_length( $length ) {
+	return 25;
+}
+add_filter( 'excerpt_length', 'konmi_custom_excerpt_length', 999 );
+
+function konmi_new_excerpt_more( $more ) {
+	//return ' ...';
+	$link = sprintf( '<a href="%1$s" class="more-link">%2$s</a>',
+		esc_url( get_permalink( get_the_ID() ) ),
+		/* translators: %s: Name of current post */
+		sprintf( __( 'Continued reading %s', 'konmi' ), '<span class="screen-reader-text">' . get_the_title( get_the_ID() ) . '</span>' )
+		);
+	return '&hellip; ' . $link;
+}
+add_filter('excerpt_more', 'konmi_new_excerpt_more');
+
+/*function konmitheme_customize_register( $wp_customize ) {
+    // All the code in this tutorial goes here
+    $wp_customize->add_setting( 'konmi_logo' ); // Add setting for logo uploader
+
+    // Add control for logo uploader (actual uploader)
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'konmi_logo', array(
+        'label'    => __( 'Upload Logo (replaces text)', 'konmi' ),
+        'section'  => 'title_tagline',
+        'settings' => 'konmi_logo',
+    ) ) );
+}
+add_action( 'customize_register', 'konmitheme_customize_register' );*/
+
 
 /**
  * Implement the Custom Header feature.

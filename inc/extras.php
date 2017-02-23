@@ -4,8 +4,20 @@
  *
  * Eventually, some of the functionality here could be replaced by core features
  *
- * @package konmi
+ * @package Konmi
  */
+
+/**
+ * Get our wp_nav_menu() fallback, wp_page_menu(), to show a home link.
+ *
+ * @param array $args Configuration arguments.
+ * @return array
+ */
+function konmi_page_menu_args( $args ) {
+	$args['show_home'] = true;
+	return $args;
+}
+add_filter( 'wp_page_menu_args', 'konmi_page_menu_args' );
 
 /**
  * Adds custom classes to the array of body classes.
@@ -69,3 +81,24 @@ if ( version_compare( $GLOBALS['wp_version'], '4.1', '<' ) ) :
 	}
 	add_action( 'wp_head', 'konmi_render_title' );
 endif;
+
+
+
+/**
+ * Display Blog Footer.
+ *
+ * @return void
+ */
+function konmi_site_info() {
+?>
+
+<div class="site-info">
+	<a href="<?php echo esc_url( __( 'http://wordpress.org/', 'konmi' ) ); ?>"><?php printf( __( 'Proudly powered by %s', 'konmi' ), 'WordPress' ); ?></a>
+	<span class="sep"> | </span>
+	<?php printf( __( 'Theme: %1$s by %2$s.', 'konmi' ), 'Konmi', '<a href="http://www.pantipmade.com" rel="designer">Pantip Treerattanapitak</a>' ); ?>
+</div><!-- .site-info -->
+
+
+<?php
+}
+add_action( 'konmi_footer', 'konmi_site_info' );
