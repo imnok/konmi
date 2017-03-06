@@ -93,9 +93,9 @@ function konmi_site_info() {
 ?>
 
 <div class="site-info">
-	<a href="<?php echo esc_url( __( 'http://wordpress.org/', 'konmi' ) ); ?>"><?php printf( __( 'Proudly powered by %s', 'konmi' ), 'WordPress' ); ?></a>
+	<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'konmi' ) ); ?>"><?php printf( __( 'Proudly powered by %s', 'konmi' ), 'WordPress' ); ?></a>
 	<span class="sep"> | </span>
-	<?php printf( __( 'Theme: %1$s by %2$s.', 'konmi' ), 'Konmi', '<a href="http://www.pantipmade.com" rel="designer">Pantip Treerattanapitak</a>' ); ?>
+	<?php printf( __( 'Theme: %1$s by %2$s.', 'konmi' ), 'Konmi', '<a href="https://pantip.ws" rel="designer">Pantip Treerattanapitak</a>' ); ?>
 </div><!-- .site-info -->
 
 

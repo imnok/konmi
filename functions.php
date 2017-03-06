@@ -44,7 +44,7 @@ function konmi_setup() {
 	/*
 	 * Enable support for Post Thumbnails on posts and pages.
 	 *
-	 * @link http://codex.wordpress.org/Function_Reference/add_theme_support#Post_Thumbnails
+	 * @link https://developer.wordpress.org/reference/functions/add_theme_support/
 	 */
 	add_theme_support( 'post-thumbnails' );
 
@@ -64,7 +64,7 @@ function konmi_setup() {
 
 	/*
 	 * Enable support for Post Formats.
-	 * See http://codex.wordpress.org/Post_Formats
+	 * See https://developer.wordpress.org/themes/functionality/post-formats/
 	 */
 	add_theme_support( 'post-formats', array(
 		'aside', 'image', 'video', 'audio', 'quote', 'link', 'gallery',
@@ -89,7 +89,7 @@ add_action( 'after_setup_theme', 'konmi_setup' );
 /**
  * Register widget area.
  *
- * @link http://codex.wordpress.org/Function_Reference/register_sidebar
+ * @link https://developer.wordpress.org/reference/functions/register_sidebar/
  */
 function konmi_widgets_init() {
 	register_sidebar( array(

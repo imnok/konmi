@@ -82,7 +82,7 @@ add_action( 'customize_preview_init', 'konmi_customize_preview_js' );
 /**
  * Sanitize URL
  *
- * http://codex.wordpress.org/Function_Reference/esc_url_raw
+ * https://developer.wordpress.org/reference/functions/esc_url_raw/
  *
  * @param string $url - The URL to be cleaned.
  * @return Valid URL | empty string

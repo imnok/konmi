@@ -10,7 +10,7 @@
 
 	</div><!-- #content -->
 
-	<footer id="colophon" class="site-footer" role="contentinfo" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+	<footer id="colophon" class="site-footer" role="contentinfo">
 		<?php do_action( 'konmi_footer' ); ?>
 	</footer><!-- #colophon -->
 
