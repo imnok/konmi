@@ -34,7 +34,7 @@ function konmi_customize_register( $wp_customize ) {
 	$wp_customize->add_section('layout' , array(
 	    'title' => __('Sidebar','konmi'),
 	    'priority'    => 35,
-	    'description' => __('Choose to show or hide sidebar for Posts page and Single page. <p>For medium and small screen device, sidebar will display below the content.</p>', 'konmi'),
+	    'description' => __('Choose to show or hide sidebar for Posts, Single post and Pages. <p>For medium and small screen device, sidebar will display below the content.</p>', 'konmi'),
 	));
 	$wp_customize->add_setting('sidebar_index', array(
 		'default'           => 'none',
@@ -59,6 +59,22 @@ function konmi_customize_register( $wp_customize ) {
 		'label'    	=> __( 'Single page', 'konmi' ),
 		'section'   => 'layout',
 		'settings'  => 'sidebar_single',
+		'type'      => 'radio',
+		'choices'   => array(
+			'none'     	=> 'Off',
+			'block'    	=> 'On',
+			
+		),
+	));
+
+	$wp_customize->add_setting('sidebar_pages', array(
+		'default'           => 'none',
+		'sanitize_callback' => 'pages_konmi_layout',
+	));
+	$wp_customize->add_control('sidebar_pages', array(
+		'label'    	=> __( 'Pages', 'konmi' ),
+		'section'   => 'layout',
+		'settings'  => 'sidebar_pages',
 		'type'      => 'radio',
 		'choices'   => array(
 			'none'     	=> 'Off',
@@ -102,4 +118,12 @@ function post_konmi_layout( $post_layout ) {
 	}
 
 	return $post_layout;
+}
+
+function pages_konmi_layout( $pages_layout ) {
+	if ( ! in_array( $pages_layout, array( 'none', 'block' ) ) ) {
+		$pages_layout = 'block';
+	}
+
+	return $pages_layout;
 }

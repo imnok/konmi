@@ -3,13 +3,16 @@
 # Konmi WordPress Theme
 
 A mininal WordPress theme with fully responsive.
-Download: <https://wordpress.org/themes/konmi/>
+<br>Download: <https://wordpress.org/themes/konmi/>
 
 By Pantip Treerattanapitak
-Any questions? Ask me at <https://pantip.ws/>
+<br>Any questions? Ask me at <https://pantip.ws/>
 <br>
 <br>
 ## Log
+
+##### Version: 1.0.7 - *Mar 7, 2017*
+* Able to show/hide the sidebar on Pages
 
 ##### Version: 1.0.6 - *Mar 6, 2017*
 * Update https url
